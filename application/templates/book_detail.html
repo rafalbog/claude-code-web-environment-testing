@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<article class="book-detail">
+    <div class="book-detail-header">
+        <div class="book-cover-large">
+            <img src="{{ book.cover }}" alt="{{ book.title }}">
+        </div>
+
+        <div class="book-main-info">
+            <span class="book-genre-tag">{{ book.genre }}</span>
+            <h1 class="book-detail-title">{{ book.title }}</h1>
+            <p class="book-detail-author">by <span>{{ book.author }}</span></p>
+
+            <div class="rating-display">
+                <div class="rating-stars">
+                    {% for i in range(5) %}
+                    <span class="star {% if i < book.rating|int %}filled{% elif i < book.rating %}half{% endif %}">★</span>
+                    {% endfor %}
+                </div>
+                <span class="rating-number">{{ book.rating }}</span>
+                <span class="rating-count">({{ book.ratings_count }} ratings)</span>
+            </div>
+
+            <p class="book-description">{{ book.description }}</p>
+
+            <div class="book-metadata">
+                <div class="meta-item">
+                    <span class="meta-label">Published</span>
+                    <span class="meta-value">{{ book.year }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Genre</span>
+                    <span class="meta-value">{{ book.genre }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Reviews</span>
+                    <span class="meta-value">{{ book.reviews|length }}</span>
+                </div>
+            </div>
+
+            <div class="rate-this-book">
+                <h3>Rate This Book</h3>
+                <div class="star-rating" data-book-id="{{ book.id }}">
+                    {% for i in range(1, 6) %}
+                    <button class="rate-star" data-rating="{{ i }}">★</button>
+                    {% endfor %}
+                </div>
+                <p class="rating-hint">Click a star to rate</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <h2>Reader Reviews</h2>
+            <button class="write-review-btn" onclick="toggleReviewForm()">Write a Review</button>
+        </div>
+
+        <form id="review-form" class="review-form hidden" onsubmit="submitReview(event, {{ book.id }})">
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" name="user" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label>Your Rating</label>
+                <div class="review-star-rating">
+                    {% for i in range(1, 6) %}
+                    <input type="radio" name="rating" id="review-star-{{ i }}" value="{{ i }}" required>
+                    <label for="review-star-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Your Review</label>
+                <textarea name="text" rows="4" placeholder="Share your thoughts about this book..." required></textarea>
+            </div>
+            <button type="submit" class="submit-review-btn">Submit Review</button>
+        </form>
+
+        <div class="reviews-list">
+            {% if book.reviews %}
+                {% for review in book.reviews %}
+                <div class="review-card" style="--index: {{ loop.index }}">
+                    <div class="review-header">
+                        <div class="reviewer-avatar">{{ review.user[0]|upper }}</div>
+                        <div class="reviewer-info">
+                            <span class="reviewer-name">{{ review.user }}</span>
+                            <span class="review-date">{{ review.date }}</span>
+                        </div>
+                        <div class="review-rating">
+                            {% for i in range(review.rating) %}
+                            <span class="star filled">★</span>
+                            {% endfor %}
+                            {% for i in range(5 - review.rating) %}
+                            <span class="star">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="review-text">{{ review.text }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-reviews">
+                    <p>No reviews yet. Be the first to share your thoughts!</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if similar %}
+    <section class="similar-books">
+        <h2>You Might Also Enjoy</h2>
+        <div class="similar-grid">
+            {% for book in similar %}
+            <a href="/book/{{ book.id }}" class="similar-book-card">
+                <img src="{{ book.cover }}" alt="{{ book.title }}">
+                <div class="similar-book-info">
+                    <h4>{{ book.title }}</h4>
+                    <p>{{ book.author }}</p>
+                    <span class="similar-rating">★ {{ book.rating }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleReviewForm() {
+    const form = document.getElementById('review-form');
+    form.classList.toggle('hidden');
+}
+
+function submitReview(event, bookId) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch('/api/review', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            book_id: bookId,
+            user: formData.get('user'),
+            rating: parseInt(formData.get('rating')),
+            text: formData.get('text')
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

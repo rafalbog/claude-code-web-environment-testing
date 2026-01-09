@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Browse Books{% endblock %}
+
+{% block content %}
+<section class="browse-page">
+    <div class="browse-header">
+        <h1>Browse Our Collection</h1>
+        <p>Explore {{ books|length }} books across our curated library</p>
+    </div>
+
+    <div class="browse-filters">
+        <div class="filter-group">
+            <label>Genre</label>
+            <select onchange="window.location.href='/browse?genre=' + this.value + '&sort={{ sort_by }}'">
+                <option value="all" {% if current_genre == 'all' %}selected{% endif %}>All Genres</option>
+                {% for genre in genres|sort %}
+                <option value="{{ genre }}" {% if current_genre == genre %}selected{% endif %}>{{ genre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Sort By</label>
+            <select onchange="window.location.href='/browse?genre={{ current_genre }}&sort=' + this.value">
+                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Top Rated</option>
+                <option value="year" {% if sort_by == 'year' %}selected{% endif %}>Newest First</option>
+                <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title A-Z</option>
+            </select>
+        </div>
+    </div>
+
+    {% if books %}
+    <div class="browse-grid">
+        {% for book in books %}
+        <article class="browse-book-card" style="--index: {{ loop.index }}">
+            <a href="/book/{{ book.id }}">
+                <div class="browse-cover">
+                    <img src="{{ book.cover }}" alt="{{ book.title }}">
+                    <div class="browse-overlay">
+                        <div class="browse-rating">
+                            <span class="star">★</span>
+                            <span>{{ book.rating }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="browse-info">
+                    <h3>{{ book.title }}</h3>
+                    <p class="browse-author">{{ book.author }}</p>
+                    <div class="browse-meta">
+                        <span>{{ book.year }}</span>
+                        <span class="dot">•</span>
+                        <span>{{ book.genre }}</span>
+                    </div>
+                    <p class="browse-description">{{ book.description[:100] }}...</p>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-results">
+        <h2>No books found</h2>
+        <p>Try adjusting your filters or <a href="/add-book">add a new book</a></p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

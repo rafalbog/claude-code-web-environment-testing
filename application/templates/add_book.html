@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Add a Book{% endblock %}
+
+{% block content %}
+<section class="add-book-page">
+    <div class="form-container">
+        <div class="form-header">
+            <h1>Add a Book</h1>
+            <p>Share a literary treasure with our community</p>
+        </div>
+
+        <form action="/add-book" method="POST" class="add-book-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="title">Book Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter the book title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" name="author" placeholder="Who wrote this book?" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="year">Publication Year</label>
+                    <input type="number" id="year" name="year" placeholder="e.g., 1984" min="1000" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="genre">Genre</label>
+                    <select id="genre" name="genre" required>
+                        <option value="">Select a genre</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre }}">{{ genre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cover">Cover Image URL</label>
+                <input type="url" id="cover" name="cover" placeholder="https://example.com/book-cover.jpg">
+                <span class="form-hint">Leave empty for a default cover</span>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5" placeholder="Tell us about this book..." required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="/" class="cancel-btn">Cancel</a>
+                <button type="submit" class="submit-btn">Add to Library</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-decoration">
+        <div class="decoration-quote">
+            <blockquote>"A room without books is like a body without a soul."</blockquote>
+            <cite>— Marcus Tullius Cicero</cite>
+        </div>
+    </div>
+</section>
+{% endblock %}

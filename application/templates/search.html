@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<section class="search-page">
+    <div class="search-header">
+        <h1>Search Results</h1>
+        {% if query %}
+        <p>Showing results for "<strong>{{ query }}</strong>"</p>
+        {% endif %}
+    </div>
+
+    <form action="/search" method="GET" class="search-page-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search for books, authors, or genres..." class="search-page-input">
+        <button type="submit" class="search-page-btn">Search</button>
+    </form>
+
+    {% if results %}
+    <div class="search-results">
+        {% for book in results %}
+        <a href="/book/{{ book.id }}" class="search-result-card" style="--index: {{ loop.index }}">
+            <img src="{{ book.cover }}" alt="{{ book.title }}" class="result-cover">
+            <div class="result-info">
+                <h3>{{ book.title }}</h3>
+                <p class="result-author">by {{ book.author }}</p>
+                <div class="result-meta">
+                    <span class="result-rating">★ {{ book.rating }}</span>
+                    <span class="result-year">{{ book.year }}</span>
+                    <span class="result-genre">{{ book.genre }}</span>
+                </div>
+                <p class="result-description">{{ book.description[:150] }}...</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="no-results">
+        <div class="no-results-icon">📚</div>
+        <h2>No books found</h2>
+        <p>We couldn't find any books matching "{{ query }}"</p>
+        <div class="no-results-suggestions">
+            <p>Suggestions:</p>
+            <ul>
+                <li>Check your spelling</li>
+                <li>Try more general keywords</li>
+                <li>Search by author name or genre</li>
+            </ul>
+        </div>
+        <a href="/browse" class="browse-link">Browse all books</a>
+    </div>
+    {% else %}
+    <div class="search-empty">
+        <div class="search-empty-icon">🔍</div>
+        <h2>Start Your Search</h2>
+        <p>Enter a book title, author name, or genre to discover your next read</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Discover Your Next<br><span class="accent">Literary Adventure</span></h1>
+        <p class="hero-subtitle">Join thousands of readers in exploring, rating, and reviewing the greatest books ever written. Your personal library awaits.</p>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-number">{{ all_books|length }}</span>
+                <span class="stat-label">Books</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">{{ all_books|map(attribute='ratings_count')|sum }}</span>
+                <span class="stat-label">Ratings</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">{{ all_books|map(attribute='reviews')|map('length')|sum }}</span>
+                <span class="stat-label">Reviews</span>
+            </div>
+        </div>
+        <a href="/browse" class="hero-cta">Explore the Collection</a>
+    </div>
+    <div class="hero-decoration">
+        <div class="floating-books">
+            {% for book in featured[:3] %}
+            <div class="floating-book" style="--delay: {{ loop.index * 0.2 }}s">
+                <img src="{{ book.cover }}" alt="{{ book.title }}">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section featured-section">
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="title-decoration">★</span>
+            Top Rated Books
+            <span class="title-decoration">★</span>
+        </h2>
+        <p class="section-subtitle">The highest acclaimed works in our collection</p>
+    </div>
+
+    <div class="book-grid">
+        {% for book in featured %}
+        <article class="book-card" style="--index: {{ loop.index }}">
+            <a href="/book/{{ book.id }}" class="book-link">
+                <div class="book-cover-wrapper">
+                    <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+                    <div class="book-overlay">
+                        <span class="view-details">View Details</span>
+                    </div>
+                    <div class="book-rating-badge">
+                        <span class="star">★</span>
+                        <span class="rating-value">{{ book.rating }}</span>
+                    </div>
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title">{{ book.title }}</h3>
+                    <p class="book-author">{{ book.author }}</p>
+                    <div class="book-meta">
+                        <span class="book-year">{{ book.year }}</span>
+                        <span class="book-genre">{{ book.genre }}</span>
+                    </div>
+                </div>
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section cta-section">
+    <div class="cta-card">
+        <div class="cta-content">
+            <h2>Share Your Literary Discoveries</h2>
+            <p>Have a beloved book that deserves recognition? Add it to our growing collection and help fellow readers discover their next favorite story.</p>
+            <a href="/add-book" class="cta-button">Add a Book</a>
+        </div>
+        <div class="cta-illustration">
+            <div class="book-stack">
+                <div class="stacked-book" style="--hue: 350"></div>
+                <div class="stacked-book" style="--hue: 220"></div>
+                <div class="stacked-book" style="--hue: 150"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section genres-section">
+    <div class="section-header">
+        <h2 class="section-title">Browse by Genre</h2>
+        <p class="section-subtitle">Find your perfect read by category</p>
+    </div>
+
+    <div class="genre-cards">
+        {% set genres = all_books|map(attribute='genre')|unique|list %}
+        {% for genre in genres[:6] %}
+        <a href="/browse?genre={{ genre }}" class="genre-card" style="--index: {{ loop.index }}">
+            <span class="genre-icon">
+                {% if 'Fantasy' in genre %}🐉
+                {% elif 'Romance' in genre %}💕
+                {% elif 'Dystopian' in genre %}🏚️
+                {% elif 'Gothic' in genre %}🏛️
+                {% elif 'Classic' in genre %}📜
+                {% elif 'Coming' in genre %}🌱
+                {% elif 'Magical' in genre %}✨
+                {% elif 'Psychological' in genre %}🧠
+                {% else %}📖
+                {% endif %}
+            </span>
+            <span class="genre-name">{{ genre }}</span>
+            <span class="genre-count">{{ all_books|selectattr('genre', 'equalto', genre)|list|length }} books</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
