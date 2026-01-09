@@ -93,6 +93,10 @@ EOF
 # Remove default nginx config
 rm -f /etc/nginx/conf.d/default.conf
 
+# Fix permissions for nginx to read static files
+chmod -R 755 /opt/book-library
+chown -R root:root /opt/book-library
+
 # Start services
 systemctl daemon-reload
 systemctl enable book-library
